@@ -1,9 +1,8 @@
-/*****************************
- * Synth
+/************************************
+ * Sympathetic Synthesizer System Mk1
  * synth.js
- * Synth for TSW
  * Copyright 2013 Stuart Memo
- *****************************/
+ ***********************************/
 
 (function (window, undefined) {
 
