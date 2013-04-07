@@ -36,8 +36,9 @@ h2:after {
     color: #FDEFA7;
 }
 
-.filter h2 {
+h1 a, .filter h2 {
     color: pink;
+    text-decoration: none;
 }
 
 .volume-filter h2 {

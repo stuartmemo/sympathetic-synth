@@ -173,6 +173,13 @@
         <script src="http://stuartmemo.com/qwerty-hancock/raphael-min.js"></script>
         <script src="http://stuartmemo.com/qwerty-hancock/qwerty-hancock.js"></script>
         <script>
+            // Check if browser is capable
+            if (typeof webkitAudioContext === 'undefined') {
+                document.querySelectorAll('.synth')[0].insertAdjacentHTML('afterbegin',
+                    '<h1>Sorry, your browser doesn\'t support the Web Audio API. ' +
+                    'Try <a href="http://google.com/chrome">Chrome</a> instead!</h1>');
+            }
+
             var synth = new Synth(),
                 keyboard = qwertyHancock({
                     id: 'keyboard',
