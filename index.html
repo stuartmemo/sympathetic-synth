@@ -1,17 +1,18 @@
+
 <!doctype html>
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>Synth</title>
+        <title>Sympathetic Synthesizer System Mk1</title>
         <meta name="description" content="An analogue synth made with the Web Audio API"/>
         <meta name="author" content="Stuart Memo"/>
-        <link rel="stylesheet" media="screen, projection" href="synth.css"/>
-        <script src="//use.typekit.net/enw0xku.js"></script>
-        <script>try{Typekit.load();}catch(e){}</script>
+        <link rel="stylesheet" media="screen, projection" href="styles/synth.css"/>
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <link rel="shortcut icon" type="image/ico" href="images/favicon.ico" />
     </head>
-    <body class="tk-futura-pt">
+    <body>
         <div class="synth">
-            <h1>Synthesizer</h1>
+            <h1>Sympathetic Synthesizer System Mk 1</h1>
             <div class="controls">
                 <div class="module oscillators">
 
@@ -143,7 +144,7 @@
                 <div class="module volume-filter">
                     <h2>Volume Filter</h2>
                     <label for="attackTime">Attack</label>
-                    <input name="attackTime" data-param="volume-filter" type="range" min="0" max="2" step="0.1" value="0.1"/>
+                    <input name="attackTime" data-param="volume-filter" type="range" min="0" max="2" step="0.1" value="0"/>
 
                     <label for="decayTime">Decay</label>
                     <input name="decayTime" data-param="volume-filter" type="range" min="0" max="1" step="0.1" value="0.5"/>
@@ -167,11 +168,11 @@
             </div>
             <div id="keyboard"></div>
         </div>
-        <script src="../../theresas-sound-world/tsw.js"></script>
-        <script src="../../theresas-sound-world/tsw-music.js"></script>
-        <script src="synth.js"></script>
+        <script src="http://stuartmemo.com/synth/scripts/tsw.min.js"></script>
+        <script src="http://stuartmemo.com/synth/scripts/tsw-music.min.js"></script>
+        <script src="scripts/synth.js"></script>
         <script src="http://stuartmemo.com/qwerty-hancock/raphael-min.js"></script>
-        <script src="qwerty-hancock.min.js"></script>
+        <script src="http://stuartmemo.com/qwerty-hancock/qwerty-hancock.js"></script>
         <script>
             var synth = new Synth(),
                 keyboard = qwertyHancock({
@@ -281,6 +282,17 @@
             keyboard.keyUp(function (note, frequency) {
                 synth.stopNote(note);
             });
+
+            // Analytics
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-32368229-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
         </script>
     </body>
 </html>
