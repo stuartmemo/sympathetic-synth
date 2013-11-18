@@ -173,6 +173,15 @@ select {
     border-width: 0 4px 4px 0;
 }
 
+.config-bar {
+    background: #272727;
+    color: white;
+    width: 892px;
+    border-bottom: 0;
+    padding-right: 0;
+    display: none;
+}
+
 .volume-filter input[type="range"] {
     background: #fe8864;
 }
@@ -222,4 +231,8 @@ select {
     height: 77px;
     border-left: none;
     border-bottom: none;
+}
+
+.note-on {
+    fill: pink;
 }

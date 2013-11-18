@@ -213,10 +213,10 @@
                 note = note.note;
             }
 
-            var noteOscillators = createOscillators.call(this, tsw.music.noteToFrequency(note)),
+            var noteOscillators = createOscillators.call(this, tsw.noteToFrequency(note)),
                 that = this;
 
-            that.noiseFrequency.frequency = tsw.music.noteToFrequency(note);
+            that.noiseFrequency.frequency = tsw.noteToFrequency(note);
             this.keysDown.push(note);
             that.noiseGate.gain.value = 1;
 
@@ -262,7 +262,7 @@
                 note = note.note;
             }
 
-            var frequency = Math.round(tsw.music.noteToFrequency(note)),
+            var frequency = Math.round(tsw.noteToFrequency(note)),
                 match = false;
 
             for (var i = 0; i < this.activeOscillators.length; i++) {
@@ -278,7 +278,7 @@
                 }
 
                 if (match) {
-                    this.activeOscillators[i].stop(timeToStop + this.volumeEnvelopeSettings.releaseTime)
+                    this.activeOscillators[i].stop(timeToStop + this.volumeEnvelopeSettings.releaseTime);
                     this.activeOscillators.splice(i,1);
 
                     this.activeVolumeEnvelopes[i].stop();
@@ -294,6 +294,7 @@
                 match = false;
             }
         };
+
 
         /*
          * Disconnect oscillators no longer in use.
@@ -315,7 +316,6 @@
 
             setTimeout(function () { synth.garbageCollection(synth) }, 1000);
         };
-
 
         return function (tsw) {
             return new Synth(tsw);
