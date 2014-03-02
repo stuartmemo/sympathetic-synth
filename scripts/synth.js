@@ -17,7 +17,7 @@
      *     synth.stopNote('C3');
      */
 
-    var Synth = (function () {
+    var Synth = (function (settings) {
 
         /*
          * Creates an instance of the synth.
@@ -25,23 +25,34 @@
          * @constructor
          * @this {Synth}
          */
-        var Synth = function () {
+
+        var Synth = function (settings) {
             this.version = '0.0.1';
-            init.call(this);
+            init.call(this, settings);
         };
+
+        var mergeObjects = function (obj1, obj2) {
+            for (var attr in obj2) {
+                obj1[attr] = obj2[attr];
+            }
+        }
 
         /*
          * Initialise the synth.
          *
          * @method init
          */
-        var init = function () {
+        var init = function (settings) {
             this.activeOscillators = [];
             this.activeVolumeEnvelopes = [];
             this.activeFilterEnvelopes = [];
             this.keysDown = [];
             this.allNodes = [],
+            this.speakersOn = false;
+            this.volume = 1;
             that = this;
+
+            this.output = tsw.gain();
 
             // Settings for the 3 oscillators.
             this.oscillators = {
@@ -62,21 +73,25 @@
                 }
             };
 
+            if (typeof settings === 'object') {
+                mergeObjects(this, settings);
+            }
+
             // Mixer settings.
             // Nodes are created here too as they don't need to be destroyed.
             this.mixer = {
                 osc1: {
-                    node: tsw.createGain(),
+                    node: tsw.gain(),
                     volume: 0.5,
                     active: true
                 },
                 osc2: {
-                    node: tsw.createGain(),
+                    node: tsw.gain(),
                     volume: 0.5,
                     active: true
                 },
                 osc3: {
-                    node: tsw.createGain(),
+                    node: tsw.gain(),
                     volume: 0.5,
                     active: true
                 }
@@ -84,6 +99,7 @@
 
             // Filter Envelope Settings
             this.filterEnvelopeSettings = {
+                name: 'Filter Envelope',
                 attackTime: 0.1,
                 decayTime: 0.5,
                 sustainLevel: 5000,
@@ -95,10 +111,11 @@
 
             // Volume Envelope settings.
             this.volumeEnvelopeSettings = {
+                name: 'Volume Envelope',
                 attackTime: 1.0,
                 decayTime: 0.5,
                 sustainLevel: 0.4,
-                releaseTime: 2,
+                releaseTime: 0,
                 startLevel: 0,
                 autoStop: false
             };
@@ -106,7 +123,7 @@
             // Output settings.
             this.gainForLFOSettings= {
                 volume: 0.5,
-                node: tsw.createGain()
+                node: tsw.gain()
             };
 
             // LFO settings.
@@ -124,16 +141,16 @@
                 release: 0.1
             };
 
-            var limiter = tsw.createCompressor(limiterSettings);
+            var limiter = tsw.compressor(limiterSettings);
 
-            this.masterVolume = tsw.createGain();
-            this.lfoSettings.node = tsw.createLFO(this.lfoSettings);
+            this.masterVolume = tsw.gain(this.volume);
+            this.lfoSettings.node = tsw.lfo(this.lfoSettings);
 
             // Noise
-            var noise = tsw.createNoise();
-            this.noiseGate = tsw.createGain();
-            this.noiseLevel = tsw.createGain();
-            this.noiseFrequency = tsw.createFilter('bandpass');
+            var noise = tsw.noise();
+            this.noiseGate = tsw.gain();
+            this.noiseLevel = tsw.gain();
+            this.noiseFrequency = tsw.filter('bandpass');
             this.noiseGate.gain.value = 0;
 
             // Start garbage collector for nodes no longer needed.
@@ -142,11 +159,15 @@
             // Connect mixer to output.
             tsw.connect([this.mixer.osc1.node, this.mixer.osc2.node, this.mixer.osc3.node],
                         this.gainForLFOSettings.node,
-                        this.masterVolume,
-                        limiter,
-                        tsw.speakers);
+                        this.masterVolume);
 
-            tsw.connect(noise, this.noiseFrequency, this.noiseLevel, this.noiseGate, this.gainForLFOSettings.node);
+            if (this.speakersOn) {
+                tsw.connect(this.masterVolume, tsw.speakers);
+            } else {
+                tsw.connect(this.masterVolume, this.output) 
+            }
+
+            //tsw.connect(noise, this.noiseFrequency, this.noiseLevel, this.noiseGate, this.gainForLFOSettings.node);
         };
 
         var rangeToFrequency = function (baseFrequency, range) {
@@ -178,18 +199,18 @@
         /*
          * Create the oscillators that generate basic sounds.
          *
-         * @method createOscillators
+         * @method oscillators
          */
         var createOscillators = function (frequency) {
             var noteOscillators = [];
 
             for (var i = 1; i < 4; i++) {
-                var oscillator = tsw.createOscillator(this.oscillators['osc' + i].waveform),
+                var oscillator = tsw.oscillator(this.oscillators['osc' + i].waveform),
                     range = this.oscillators['osc' + i].range,
                     detune = this.oscillators['osc' + i].detune;
 
-                oscillator.frequency.value = rangeToFrequency(frequency, range);
-                oscillator.detune.value = detune;
+                oscillator.frequency(rangeToFrequency(frequency, range));
+                oscillator.detune(detune);
                 noteOscillators.push(oscillator);
             }
 
@@ -213,33 +234,33 @@
                 note = note.note;
             }
 
-            var noteOscillators = createOscillators.call(this, tsw.noteToFrequency(note)),
+            var noteOscillators = createOscillators.call(this, tsw.frequency(note)),
                 that = this;
 
-            that.noiseFrequency.frequency = tsw.noteToFrequency(note);
+            that.noiseFrequency.frequency = tsw.frequency(note);
             this.keysDown.push(note);
             that.noiseGate.gain.value = 1;
 
             noteOscillators.forEach(function (oscillator, index) {
-                var gainForEnvelope = tsw.createGain(),
-                    filter = tsw.createFilter('lowpass'),
+                var gainForEnvelope = tsw.gain(),
+                    filter = tsw.filter('lowpass'),
                     volEnvelope,
                     filterEnvelope;
 
                 index++;
 
-                that.volumeEnvelopeSettings.param = gainForEnvelope.gain;
+                that.volumeEnvelopeSettings.param = gainForEnvelope.params.gain;
                 that.filterEnvelopeSettings.param = filter.frequency;
 
-                volEnvelope = tsw.createEnvelope(that.volumeEnvelopeSettings);
-                filterEnvelope = tsw.createEnvelope(that.filterEnvelopeSettings);
+                volEnvelope = tsw.envelope(that.volumeEnvelopeSettings);
+                filterEnvelope = tsw.envelope(that.filterEnvelopeSettings);
 
                 tsw.connect(oscillator, gainForEnvelope, filter, that.mixer['osc' + index].node);
 
-                oscillator.start(timeToStart);
                 volEnvelope.start(timeToStart);
                 filterEnvelope.start(timeToStart);
 
+                oscillator.start(timeToStart);
                 that.activeOscillators.push(oscillator);
                 that.activeVolumeEnvelopes.push(volEnvelope);
                 that.activeFilterEnvelopes.push(filterEnvelope);
@@ -255,36 +276,38 @@
          * @param {note} string Musical note to stop playing.
          */
         Synth.prototype.stopNote = function (note) {
-            var timeToStop = tsw.now();
+            var timeToStop = tsw.now(),
+                frequency,
+                match = false;
 
             if (typeof note === 'object') {
                 timeToStop = note.stopTime;
                 note = note.note;
             }
 
-            var frequency = Math.round(tsw.noteToFrequency(note)),
-                match = false;
+            frequency = tsw.frequency(note);
 
             for (var i = 0; i < this.activeOscillators.length; i++) {
                 for (oscillator in this.oscillators) {
-
-                    var oscType = this.activeOscillators[i].safariType;
+                    var oscType = this.activeOscillators[i].type();
 
                     if (this.oscillators[oscillator].waveform === oscType) {
-                        if (Math.round(rangeToFrequency(frequency, this.oscillators[oscillator].range)) === Math.round(this.activeOscillators[i].frequency.value)) {
+
+                        if (Math.floor(rangeToFrequency(frequency, this.oscillators[oscillator].range)) === Math.floor(this.activeOscillators[i].frequency())) {
                             match = true;
                         }
                     }
                 }
 
                 if (match) {
-                    this.activeOscillators[i].stop(timeToStop + this.volumeEnvelopeSettings.releaseTime);
+                    this.activeOscillators[i].stop(timeToStop + (this.volumeEnvelopeSettings.releaseTime));
+
                     this.activeOscillators.splice(i,1);
 
-                    this.activeVolumeEnvelopes[i].stop();
+                    this.activeVolumeEnvelopes[i].stop(timeToStop);
                     this.activeVolumeEnvelopes.splice(i,1);
 
-                    this.activeFilterEnvelopes[i].stop();
+                    this.activeFilterEnvelopes[i].stop(timeToStop);
                     this.activeFilterEnvelopes.splice(i,1);
                     i--;
                 }
@@ -317,9 +340,7 @@
             setTimeout(function () { synth.garbageCollection(synth) }, 1000);
         };
 
-        return function (tsw) {
-            return new Synth(tsw);
-        };
+        return Synth;
     })();
 
     window.Synth = Synth;
