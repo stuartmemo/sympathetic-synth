@@ -269,10 +269,10 @@
                                 break;
                         };
                     case 'volume':
-                        synth.masterVolume.gain.value = this.value;
+                        synth.masterVolume.gain(this.value);
                         break;
                     case 'noise':
-                        synth.noiseLevel.gain.value = this.value;
+                        synth.noiseLevel.gain(this.value);
                         break;
                     default:
                         break;
