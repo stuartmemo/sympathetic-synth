@@ -29,8 +29,8 @@
                         <div class="right-half">
                             <label for="osc1-range">Range</label>
                             <select data-oscillator="osc1" data-param="range" name="osc1-range" class="range">
-                                <option value="32">32</option>
-                                <option value="16" selected>16</option>
+                                <option value="32" selected>32</option>
+                                <option value="16">16</option>
                                 <option value="8">8</option>
                                 <option value="4">4</option>
                                 <option value="2">2</option>
@@ -57,8 +57,8 @@
                             <label for="osc2-range">Range</label>
                             <select data-oscillator="osc2" data-param="range" name="osc2-range" class="range">
                                 <option value="32">32</option>
-                                <option value="16">16</option>
-                                <option value="8" selected>8</option>
+                                <option value="16" selected>16</option>
+                                <option value="8">8</option>
                                 <option value="4">4</option>
                                 <option value="2">2</option>
                             </select>
@@ -75,9 +75,9 @@
                         <div class="left-half">
                             <label for="osc3-waveform">Waveform</label>
                             <select data-oscillator="osc3" data-param="waveform" name="osc3-waveform">
-                                <option value="triangle" selected>Triangle</option>
+                                <option value="triangle">Triangle</option>
                                 <option value="sawtooth">Sawtooth</option>
-                                <option value="square">Square</option>
+                                <option value="square" selected>Square</option>
                             </select>
                         </div>
                         <div class="right-half">
@@ -86,7 +86,7 @@
                                 <option value="32">32</option>
                                 <option value="16">16</option>
                                 <option value="8">8</option>
-                                <option value="4">4</option>
+                                <option value="4" >4</option>
                                 <option value="2" selected>2</option>
                             </select>
                         </div>
@@ -142,17 +142,17 @@
                 </div>
                 <div class="module volume-filter">
                     <h2>Volume Filter</h2>
-                    <label for="attackTime">Attack</label>
-                    <input name="attackTime" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
+                    <label for="attack">Attack</label>
+                    <input name="attack" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
 
-                    <label for="decayTime">Decay</label>
-                    <input name="decayTime" data-param="volume-filter" type="range" min="0" max="1" step="0.1" value="0"/>
+                    <label for="decay">Decay</label>
+                    <input name="decay" data-param="volume-filter" type="range" min="0" max="1" step="0.1" value="0"/>
                     
-                    <label for="sustainLevel">Sustain</label>
-                    <input name="sustainLevel" data-param="volume-filter" type="range" min="0" max="1" step="0.01" value="0.5"/>
+                    <label for="sustain">Sustain</label>
+                    <input name="sustain" data-param="volume-filter" type="range" min="0" max="1" step="0.01" value="0.5"/>
                     
-                    <label for="releaseTime">Release</label>
-                    <input name="releaseTime" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
+                    <label for="release">Release</label>
+                    <input name="release" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
                 </div>
                 <div class="module noise">
                     <h2>Noise</h2>
@@ -164,15 +164,15 @@
                     <label for="volume">Volume</label>
                     <input name="volume" data-param="volume" type="range" min="0" max="1" step="0.01"/>
                 </div>
-                <div class=" module config-bar">
+                <div class="module config-bar">
                     MIDI 
                 </div>
             </div>
             <div id="keyboard"></div>
         </div>
-        <script src="scripts/tsw.min.js"></script>
+        <script src="app/bower_components/tsw/dist/tsw.min.js"></script>
         <script src="scripts/synth.js"></script>
-        <script src="http://stuartmemo.com/qwerty-hancock/qwerty-hancock.js"></script>
+        <script src="app/bower_components/qwerty-hancock/dist/qwerty-hancock.min.js"></script>
         <script>
             // Check if browser is capable
             if ((typeof webkitAudioContext === 'undefined') && (typeof AudioContext === 'undefined')) {
@@ -187,7 +187,7 @@
                 }),
                 keyboard = new QwertyHancock({
                     id: 'keyboard',
-                    width: 910,
+                    width: 908,
                     height: 150,
                     startKey: 'A3',
                     hoverColour: '#FFE976'
@@ -222,16 +222,16 @@
                     case 'filter':
                         switch (this.name) {
                             case 'filter-attack':
-                                synth.filterEnvelopeSettings.attackTime = parseInt(this.value, 10);
+                                synth.filterEnvelopeSettings.attack = parseInt(this.value, 10);
                                 break;
                             case 'filter-decay':
-                                synth.filterEnvelopeSettings.decayTime = parseInt(this.value, 10);
+                                synth.filterEnvelopeSettings.decay = parseInt(this.value, 10);
                                 break;
                             case 'filter-sustain':
-                                synth.filterEnvelopeSettings.sustainLevel = parseInt(this.value, 10);
+                                synth.filterEnvelopeSettings.sustain = parseInt(this.value, 10);
                                 break;
                             case 'filter-release':
-                                synth.filterEnvelopeSettings.releaseTime = parseInt(this.value, 10);
+                                synth.filterEnvelopeSettings.release = parseInt(this.value, 10);
                                 break;
                             case 'cutoffFrequency':
                                 synth.filterEnvelopeSettings.startLevel = parseInt(this.value, 10);
@@ -250,18 +250,18 @@
                         synth.volumeEnvelopeSettings[this.name] = parseFloat(this.value, 10);
                         break;
                     case 'mixer':
-                        synth.mixer[osc].node.gain.value = this.value;
+                        synth.mixer[osc].node.gain(this.value);
                         break;
                     case 'lfo':
                         switch (this.name) {
                             case 'lfo-waveType':
-                                synth.lfoSettings.node.setWaveType(this.value);
+                                synth.lfoSettings.waveType = this.value;
                                 break;
                             case 'lfo-frequency':
-                                synth.lfoSettings.node.frequency.value = this.value;
+                                synth.lfoSettings.frequency = this.value;
                                 break;
                             case 'lfo-depth':
-                                synth.lfoSettings.node.depth(this.value);
+                                synth.lfoSettings.node.depth = this.value;
                                 break;
                             default:
                                 break;
@@ -295,7 +295,7 @@
 
             var messageReceived = function (message) {
 
-                var note = tsw.note(message.data[1]),
+                var note = tsw.midiNote(message.data[1]),
                     keys = document.querySelectorAll('#keyboard li');
 
                 // Only accept note data.
@@ -321,7 +321,7 @@
                                     }
                                 }
                         }
-                        synth.stopNote(tsw.midi.MIDINumberToNote(message.data[1]));
+                        synth.stopNote(tsw.midiNote(message.data[1]));
                     }
                 }
             };
@@ -330,7 +330,7 @@
                 window.midi = midi
                 var inputs = midi.inputs();
 
-                document.querySelector('.config-bar').style.display = 'block';
+                //document.querySelector('.config-bar').style.display = 'block';
 
                 if (inputs.length) {
                     var input = inputs[0];

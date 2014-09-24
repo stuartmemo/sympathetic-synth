@@ -100,11 +100,11 @@
             // Filter Envelope Settings
             this.filterEnvelopeSettings = {
                 name: 'Filter Envelope',
-                attackTime: 0.1,
-                decayTime: 0.5,
-                sustainLevel: 5000,
+                attack: 0.1,
+                decay: 0.5,
+                sustain: 5000,
                 Q: 5,
-                releaseTime: 1,
+                release: 1,
                 maxLevel: 10000,
                 autoStop: false
             };
@@ -112,10 +112,10 @@
             // Volume Envelope settings.
             this.volumeEnvelopeSettings = {
                 name: 'Volume Envelope',
-                attackTime: 1.0,
-                decayTime: 0.5,
-                sustainLevel: 0.4,
-                releaseTime: 0,
+                attack: 1.0,
+                decay: 0.5,
+                sustain: 0.4,
+                release: 0,
                 startLevel: 0,
                 autoStop: false
             };
@@ -191,7 +191,7 @@
                     break;
                 default:
                     break;
-            };
+            }
              
              return frequency;
         };
@@ -205,7 +205,7 @@
             var noteOscillators = [];
 
             for (var i = 1; i < 4; i++) {
-                var oscillator = tsw.oscillator(this.oscillators['osc' + i].waveform),
+                var oscillator = tsw.oscillator(null, this.oscillators['osc' + i].waveform),
                     range = this.oscillators['osc' + i].range,
                     detune = this.oscillators['osc' + i].detune;
 
@@ -300,14 +300,14 @@
                 }
 
                 if (match) {
-                    this.activeOscillators[i].stop(timeToStop + (this.volumeEnvelopeSettings.releaseTime));
+                    this.activeOscillators[i].stop(timeToStop + this.volumeEnvelopeSettings.release);
 
                     this.activeOscillators.splice(i,1);
 
-                    this.activeVolumeEnvelopes[i].stop(timeToStop);
+                    this.activeVolumeEnvelopes[i].release(timeToStop);
                     this.activeVolumeEnvelopes.splice(i,1);
 
-                    this.activeFilterEnvelopes[i].stop(timeToStop);
+                    this.activeFilterEnvelopes[i].release(timeToStop);
                     this.activeFilterEnvelopes.splice(i,1);
                     i--;
                 }
