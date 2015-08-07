@@ -144,7 +144,7 @@
             var limiter = tsw.compressor(limiterSettings);
 
             this.masterVolume = tsw.gain(this.volume);
-            this.lfoSettings.node = tsw.lfo(this.lfoSettings);
+            // this.lfoSettings.node = tsw.lfo(this.lfoSettings);
 
             // Noise
             var noise = tsw.noise();
@@ -158,13 +158,13 @@
 
             // Connect mixer to output.
             tsw.connect([this.mixer.osc1.node, this.mixer.osc2.node, this.mixer.osc3.node],
-                        this.gainForLFOSettings.node,
+//                        this.gainForLFOSettings.node,
                         this.masterVolume);
 
             if (this.speakersOn) {
                 tsw.connect(this.masterVolume, tsw.speakers);
             } else {
-                tsw.connect(this.masterVolume, this.output) 
+                tsw.connect(this.masterVolume, this.output)
             }
 
             //tsw.connect(noise, this.noiseFrequency, this.noiseLevel, this.noiseGate, this.gainForLFOSettings.node);
@@ -192,7 +192,7 @@
                 default:
                     break;
             }
-             
+
              return frequency;
         };
 

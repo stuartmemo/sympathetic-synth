@@ -57,9 +57,9 @@
                             <label for="osc2-range">Range</label>
                             <select data-oscillator="osc2" data-param="range" name="osc2-range" class="range">
                                 <option value="32">32</option>
-                                <option value="16" selected>16</option>
+                                <option value="16">16</option>
                                 <option value="8">8</option>
-                                <option value="4">4</option>
+                                <option value="4" selected>4</option>
                                 <option value="2">2</option>
                             </select>
                         </div>
@@ -84,10 +84,10 @@
                             <label for="osc3-range">Range</label>
                             <select data-oscillator="osc3" data-param="range" name="osc3-range">
                                 <option value="32">32</option>
-                                <option value="16">16</option>
+                                <option value="16" selected>16</option>
                                 <option value="8">8</option>
                                 <option value="4" >4</option>
-                                <option value="2" selected>2</option>
+                                <option value="2">2</option>
                             </select>
                         </div>
 
@@ -147,10 +147,10 @@
 
                     <label for="decay">Decay</label>
                     <input name="decay" data-param="volume-filter" type="range" min="0" max="1" step="0.1" value="0"/>
-                    
+
                     <label for="sustain">Sustain</label>
                     <input name="sustain" data-param="volume-filter" type="range" min="0" max="1" step="0.01" value="0.5"/>
-                    
+
                     <label for="release">Release</label>
                     <input name="release" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
                 </div>
@@ -165,14 +165,14 @@
                     <input name="volume" data-param="volume" type="range" min="0" max="1" step="0.01"/>
                 </div>
                 <div class="module config-bar">
-                    MIDI 
+                    MIDI
                 </div>
             </div>
             <div id="keyboard"></div>
         </div>
-        <script src="app/bower_components/tsw/dist/tsw.min.js"></script>
+        <script src="bower_components/tsw/dist/tsw.js"></script>
         <script src="scripts/synth.js"></script>
-        <script src="app/bower_components/qwerty-hancock/dist/qwerty-hancock.min.js"></script>
+        <script src="bower_components/qwerty-hancock/dist/qwerty-hancock.min.js"></script>
         <script>
             // Check if browser is capable
             if ((typeof webkitAudioContext === 'undefined') && (typeof AudioContext === 'undefined')) {
@@ -235,7 +235,7 @@
                                 break;
                             case 'cutoffFrequency':
                                 synth.filterEnvelopeSettings.startLevel = parseInt(this.value, 10);
-                                break; 
+                                break;
                             case 'emphasis':
                                 synth.filterEnvelopeSettings.Q = parseInt(this.value, 10);
                                 break;
@@ -253,6 +253,7 @@
                         synth.mixer[osc].node.gain(this.value);
                         break;
                     case 'lfo':
+                        break;
                         switch (this.name) {
                             case 'lfo-waveType':
                                 synth.lfoSettings.waveType = this.value;
@@ -276,7 +277,7 @@
                         break;
                 };
             };
-            
+
             for (var i = 0; i < inputs.length; i++) {
                 inputs[i].addEventListener('change', function () {
                     updateSettings.call(this);
@@ -284,7 +285,7 @@
 
                 updateSettings.call(inputs[i]);
             }
-            
+
             keyboard.keyDown = function (note, frequency) {
                 synth.playNote(note);
             };
@@ -339,17 +340,6 @@
             }, function () {
                 console.log('no midi support')
             });
-
-            // Analytics
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-32368229-1']);
-            _gaq.push(['_trackPageview']);
-
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
         </script>
     </body>
 </html>

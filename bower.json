@@ -1,0 +1,25 @@
+{
+  "name": "sympathetic-synth",
+  "version": "0.1.0",
+  "homepage": "https://github.com/stuartmemo/sympathetic-synth",
+  "authors": [
+    "Stuart Memo <stuartmemo@gmail.com>"
+  ],
+  "description": "A synth for all occasions",
+  "main": "main.js",
+  "keywords": [
+    "synth"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "tsw": "~0.2.4",
+    "qwerty-hancock": "~0.4.5"
+  }
+}
