@@ -116,8 +116,7 @@
                 decay: 0.5,
                 sustain: 0.4,
                 release: 0,
-                startLevel: 0,
-                autoStop: false
+                startLevel: 0
             };
 
             // Output settings.
@@ -241,6 +240,28 @@
             this.keysDown.push(note);
             that.noiseGate.gain.value = 1;
 
+			function drawGraph (vol) {
+				var graph = document.getElementById('volume-graph'),
+				graphHeight = graph.height, // haha graphite.
+				graphWidth = graph.width,
+				ctx = graph.getContext('2d'),
+				i = 0,
+				interval = 100,
+				totalTimeToGraph = 50,
+				maxGain = 1;
+
+				ctx.moveTo(0, graphHeight); // start graph at bottom left.
+
+				var interval = setInterval(function () {
+					var x = (graph.width / totalTimeToGraph) * i,
+					y = graph.height - (graph.height * vol.params.gain.value);
+
+					ctx.lineTo(x, y);
+					ctx.stroke();
+					i++;
+				}, 100);
+			};
+
             noteOscillators.forEach(function (oscillator, index) {
                 var gainForEnvelope = tsw.gain(),
                     filter = tsw.filter('lowpass'),
@@ -257,10 +278,12 @@
 
                 tsw.connect(oscillator, gainForEnvelope, filter, that.mixer['osc' + index].node);
 
+                drawGraph(gainForEnvelope);
+
+                oscillator.start(timeToStart);
                 volEnvelope.start(timeToStart);
                 filterEnvelope.start(timeToStart);
 
-                oscillator.start(timeToStart);
                 that.activeOscillators.push(oscillator);
                 that.activeVolumeEnvelopes.push(volEnvelope);
                 that.activeFilterEnvelopes.push(filterEnvelope);
@@ -302,13 +325,14 @@
                 if (match) {
                     this.activeOscillators[i].stop(timeToStop + this.volumeEnvelopeSettings.release);
 
-                    this.activeOscillators.splice(i,1);
+                    this.activeOscillators.splice(i, 1);
 
+                    console.log(this.activeVolumeEnvelopes[i]);
                     this.activeVolumeEnvelopes[i].release(timeToStop);
-                    this.activeVolumeEnvelopes.splice(i,1);
+                    this.activeVolumeEnvelopes.splice(i, 1);
 
                     this.activeFilterEnvelopes[i].release(timeToStop);
-                    this.activeFilterEnvelopes.splice(i,1);
+                    this.activeFilterEnvelopes.splice(i, 1);
                     i--;
                 }
 
