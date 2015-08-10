@@ -146,13 +146,13 @@
                     <input name="attack" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
 
                     <label for="decay">Decay</label>
-                    <input name="decay" data-param="volume-filter" type="range" min="0" max="1" step="0.1" value="0"/>
+                    <input name="decay" data-param="volume-filter" type="range" min="0.1" max="5" step="0.1" value="1"/>
 
                     <label for="sustain">Sustain</label>
-                    <input name="sustain" data-param="volume-filter" type="range" min="0" max="1" step="0.01" value="0.5"/>
+                    <input name="sustain" data-param="volume-filter" type="range" min="0.1" max="1" step="0.01" value="0.5"/>
 
                     <label for="release">Release</label>
-                    <input name="release" data-param="volume-filter" type="range" min="0" max="5" step="0.1" value="0"/>
+                    <input name="release" data-param="volume-filter" type="range" min="0" max="10" step="0.1" value="0"/>
                 </div>
                 <div class="module noise">
                     <h2>Noise</h2>
@@ -341,5 +341,7 @@
                 console.log('no midi support')
             });
         </script>
+
+        <canvas id="volume-graph" style="border: 1px solid white; display: none;"></canvas>
     </body>
 </html>
