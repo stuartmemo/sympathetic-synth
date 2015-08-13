@@ -276,7 +276,8 @@
                 volEnvelope = tsw.envelope(that.volumeEnvelopeSettings);
                 filterEnvelope = tsw.envelope(that.filterEnvelopeSettings);
 
-                tsw.connect(oscillator, gainForEnvelope, filter, that.mixer['osc' + index].node);
+                // tsw.connect(oscillator, gainForEnvelope, filter, that.mixer['osc' + index].node);
+                tsw.connect(oscillator, gainForEnvelope, that.mixer['osc' + index].node);
 
                 drawGraph(gainForEnvelope);
 
@@ -327,7 +328,6 @@
 
                     this.activeOscillators.splice(i, 1);
 
-                    console.log(this.activeVolumeEnvelopes[i]);
                     this.activeVolumeEnvelopes[i].release(timeToStop);
                     this.activeVolumeEnvelopes.splice(i, 1);
 
