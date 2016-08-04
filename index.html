@@ -343,14 +343,11 @@
 
                 function midiHasInputs(midi)
                 {
-                    //var hasInputs = false;
-
                     if(isFunction(midi.inputs))
                     {
                         inputs = midi.inputs();
                         if(inputs.length)
                         {
-                            //hasInputs = true;
                             addMidiMessageEventListener(inputs[0]);
                         }
                     }
@@ -362,8 +359,6 @@
 
                             if(!i)
                             {
-                               // hasInputs = true;
-                                debugger
                                 addMidiMessageEventListener(input);
                             }
 
@@ -374,11 +369,6 @@
                     return hasInputs;
                 }
 
-                //document.querySelector('.config-bar').style.display = 'block';
-
-               /* if (midiHasInputs(midi)) {
-                    addMidiMessageEventListener(input);
-                }*/
             }, function () {
                 console.log('no midi support')
             });
