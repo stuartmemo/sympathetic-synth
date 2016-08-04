@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "tsw": "~0.2.6",
+    "tsw": "~0.2.7",
     "qwerty-hancock": "~0.4.5"
   }
 }

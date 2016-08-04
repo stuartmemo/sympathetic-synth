@@ -329,14 +329,56 @@
 
             tsw.getUserMidi(function (midi) {
                 window.midi = midi
-                var inputs = midi.inputs();
+                var inputs;
+
+                var isFunction = function (thing) {
+                    return typeof thing === 'function';
+                };
+
+                function addMidiMessageEventListener(input)
+                {
+                    //input = inputs[0];
+                    input.addEventListener('midimessage', messageReceived);
+                }
+
+                function midiHasInputs(midi)
+                {
+                    //var hasInputs = false;
+
+                    if(isFunction(midi.inputs))
+                    {
+                        inputs = midi.inputs();
+                        if(inputs.length)
+                        {
+                            //hasInputs = true;
+                            addMidiMessageEventListener(inputs[0]);
+                        }
+                    }
+                    else
+                    {
+                        var i = 0;
+
+                        midi.inputs.forEach(function (input){
+
+                            if(!i)
+                            {
+                               // hasInputs = true;
+                                debugger
+                                addMidiMessageEventListener(input);
+                            }
+
+                            i++;
+                        });
+                    }
+
+                    return hasInputs;
+                }
 
                 //document.querySelector('.config-bar').style.display = 'block';
 
-                if (inputs.length) {
-                    var input = inputs[0];
-                    input.addEventListener('midimessage', messageReceived);
-                }
+               /* if (midiHasInputs(midi)) {
+                    addMidiMessageEventListener(input);
+                }*/
             }, function () {
                 console.log('no midi support')
             });
