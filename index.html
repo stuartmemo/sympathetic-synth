@@ -329,14 +329,46 @@
 
             tsw.getUserMidi(function (midi) {
                 window.midi = midi
-                var inputs = midi.inputs();
+                var inputs;
 
-                //document.querySelector('.config-bar').style.display = 'block';
+                var isFunction = function (thing) {
+                    return typeof thing === 'function';
+                };
 
-                if (inputs.length) {
-                    var input = inputs[0];
+                function addMidiMessageEventListener(input)
+                {
+                    //input = inputs[0];
                     input.addEventListener('midimessage', messageReceived);
                 }
+
+                function midiHasInputs(midi)
+                {
+                    if(isFunction(midi.inputs))
+                    {
+                        inputs = midi.inputs();
+                        if(inputs.length)
+                        {
+                            addMidiMessageEventListener(inputs[0]);
+                        }
+                    }
+                    else
+                    {
+                        var i = 0;
+
+                        midi.inputs.forEach(function (input){
+
+                            if(!i)
+                            {
+                                addMidiMessageEventListener(input);
+                            }
+
+                            i++;
+                        });
+                    }
+
+                    return hasInputs;
+                }
+
             }, function () {
                 console.log('no midi support')
             });
