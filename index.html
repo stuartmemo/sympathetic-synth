@@ -6,7 +6,7 @@
         <meta name="description" content="An analogue synth made with the Web Audio API"/>
         <meta name="author" content="Stuart Memo"/>
         <link rel="stylesheet" media="screen, projection" href="styles/synth.css"/>
-        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
         <link rel="shortcut icon" type="image/ico" href="images/favicon.ico" />
     </head>
     <body>
@@ -170,15 +170,15 @@
             </div>
             <div id="keyboard"></div>
         </div>
-        <script src="bower_components/tsw/dist/tsw.js"></script>
+        <script src="https://theresassoundworld.com/scripts/tsw.min.js"></script>
         <script src="scripts/synth.js"></script>
-        <script src="bower_components/qwerty-hancock/dist/qwerty-hancock.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qwerty-hancock/0.6.0/qwerty-hancock.min.js"></script>
         <script>
             // Check if browser is capable
             if ((typeof webkitAudioContext === 'undefined') && (typeof AudioContext === 'undefined')) {
                 document.querySelectorAll('.synth')[0].insertAdjacentHTML('afterbegin',
                     '<h1>Sorry, your browser doesn\'t support the Web Audio API. ' +
-                    'Try <a href="http://google.com/chrome">Chrome</a> instead!</h1>');
+                    'Try <a href="https://google.com/chrome">Chrome</a> instead!</h1>');
             }
 
             var synth = new Synth({
@@ -329,14 +329,13 @@
 
             tsw.getUserMidi(function (midi) {
                 window.midi = midi
-                var inputs = midi.inputs();
 
                 //document.querySelector('.config-bar').style.display = 'block';
 
-                if (inputs.length) {
-                    var input = inputs[0];
+                midi.inputs.forEach(function (input) {
                     input.addEventListener('midimessage', messageReceived);
-                }
+                });
+
             }, function () {
                 console.log('no midi support')
             });

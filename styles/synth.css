@@ -106,10 +106,10 @@ select {
 
 .last:after {
     clear: both;
-    content: "."; 
-    visibility: hidden; 
-    display: block; 
-    height: 0; 
+    content: ".";
+    visibility: hidden;
+    display: block;
+    height: 0;
     clear: both;
 }
 
@@ -157,7 +157,7 @@ select {
 }
 
 .lfo {
-    background: #89BD79; 
+    background: #89BD79;
     border-radius: 0 2px 0 0;
     width: 150px;
     height: 162px;
@@ -166,7 +166,7 @@ select {
 }
 
 .volume-filter {
-    background: #E25D34; 
+    background: #E25D34;
     height: 190px;
     width: 229px;
     float: left;
@@ -235,4 +235,8 @@ select {
 
 .note-on {
     fill: pink;
+}
+
+ul {
+    float: left;
 }

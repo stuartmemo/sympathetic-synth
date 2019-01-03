@@ -1,0 +1,28 @@
+{
+  "name": "sympathetic-synth",
+  "version": "0.1.0",
+  "description": "A synthesizer with feelings",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stuartmemo/sympathetic-synth.git"
+  },
+  "keywords": [
+    "synth",
+    "web",
+    "audio"
+  ],
+  "author": "Stuart Memo <stuartmemo@gmail.com> (https://stuartmemo.com)",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/stuartmemo/sympathetic-synth/issues"
+  },
+  "homepage": "https://github.com/stuartmemo/sympathetic-synth#readme",
+  "dependencies": {
+    "http-server": "^0.11.1"
+  }
+}
