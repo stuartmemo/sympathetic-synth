@@ -1,0 +1,42 @@
+{
+  "name": "sympathetic-synth",
+  "version": "1.0.0",
+  "description": "A synth for all occasions - built with Web Audio API and AI",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "keywords": [
+    "synth",
+    "synthesizer",
+    "web-audio",
+    "typescript",
+    "ai"
+  ],
+  "author": "Stuart Memo <stuartmemo@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/stuartmemo/sympathetic-synth",
+  "dependencies": {
+    "@ai-sdk/anthropic": "^1.0.0",
+    "ai": "^4.0.0",
+    "next": "^15.0.0",
+    "qwerty-hancock": "^1.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^20.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^15.0.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.3.3"
+  }
+}
