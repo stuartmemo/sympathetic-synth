@@ -10,7 +10,7 @@ export default function Home() {
   const [keyboardOctave, setKeyboardOctave] = useState(4);
 
   return (
-    <main className="w-full flex flex-col xl:flex-row xl:items-stretch xl:justify-center">
+    <main className="w-full flex flex-col xl:flex-row xl:items-stretch xl:justify-center gap-0">
       <SynthPanel
         synthRef={synthRef}
         keyboardOctave={keyboardOctave}
