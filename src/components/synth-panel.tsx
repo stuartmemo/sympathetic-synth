@@ -144,7 +144,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
   };
 
   useEffect(() => {
-    synthRef.current = new Synth({ speakersOn: true, volume: 0.3 });
+    synthRef.current = new Synth({ speakersOn: true, volume: 0.5 });
 
     // Initialize MIDI
     const audioEngine = getAudioEngine();
@@ -276,7 +276,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
               min="0"
               max="1"
               step="0.05"
-              defaultValue="0.5"
+              defaultValue="0.25"
               onChange={handleChange}
               className="synth-slider bg-[#fbefb3]"
             />
@@ -336,8 +336,8 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
               type="range"
               min="0"
               max="1"
-              step="0.1"
-              defaultValue="0.5"
+              step="0.05"
+              defaultValue="0.25"
               onChange={handleChange}
               className="synth-slider bg-[#fbefb3]"
             />
@@ -397,8 +397,8 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
               type="range"
               min="0"
               max="1"
-              step="0.1"
-              defaultValue="0.5"
+              step="0.05"
+              defaultValue="0.25"
               onChange={handleChange}
               className="synth-slider bg-[#fbefb3]"
             />
@@ -658,7 +658,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
               min="0"
               max="1"
               step="0.01"
-              defaultValue="0.3"
+              defaultValue="0.5"
               onChange={handleChange}
               className="synth-slider bg-[#49bce2] w-full max-w-[120px]"
             />

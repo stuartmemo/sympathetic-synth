@@ -116,21 +116,21 @@ export class Synth {
     this.audioEngine = getAudioEngine();
     this.speakersOn = settings.speakersOn ?? true;
 
-    // Create mixer channels
+    // Create mixer channels (lower defaults to prevent clipping when combined)
     this.mixer = {
       osc1: {
-        node: this.audioEngine.createGain(0.5),
-        volume: 0.5,
+        node: this.audioEngine.createGain(0.25),
+        volume: 0.25,
         active: true,
       },
       osc2: {
-        node: this.audioEngine.createGain(0.5),
-        volume: 0.5,
+        node: this.audioEngine.createGain(0.25),
+        volume: 0.25,
         active: true,
       },
       osc3: {
-        node: this.audioEngine.createGain(0.5),
-        volume: 0.5,
+        node: this.audioEngine.createGain(0.25),
+        volume: 0.25,
         active: true,
       },
     };
