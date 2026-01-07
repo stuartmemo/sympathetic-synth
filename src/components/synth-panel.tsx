@@ -144,7 +144,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
   };
 
   useEffect(() => {
-    synthRef.current = new Synth({ speakersOn: true, volume: 0.5 });
+    synthRef.current = new Synth({ speakersOn: true, volume: 0.3 });
 
     // Initialize MIDI
     const audioEngine = getAudioEngine();
@@ -658,7 +658,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
               min="0"
               max="1"
               step="0.01"
-              defaultValue="0.5"
+              defaultValue="0.3"
               onChange={handleChange}
               className="synth-slider bg-[#49bce2] w-full max-w-[120px]"
             />
