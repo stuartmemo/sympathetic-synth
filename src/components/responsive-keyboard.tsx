@@ -10,6 +10,7 @@ interface ResponsiveKeyboardProps {
   blackKeyColor?: string;
   octave?: number;
   onOctaveChange?: (octave: number) => void;
+  externalActiveNotes?: Set<string>;
 }
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -56,12 +57,18 @@ export function ResponsiveKeyboard({
   blackKeyColor = '#000',
   octave: externalOctave,
   onOctaveChange,
+  externalActiveNotes,
 }: ResponsiveKeyboardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [internalOctave, setInternalOctave] = useState(4);
   const octave = externalOctave ?? internalOctave;
   const setOctave = onOctaveChange ?? setInternalOctave;
   const [activeNotes, setActiveNotes] = useState<Set<string>>(new Set());
+
+  // Combine internal active notes with external (MIDI) active notes
+  const allActiveNotes = externalActiveNotes
+    ? new Set([...activeNotes, ...externalActiveNotes])
+    : activeNotes;
   const [visibleOctaves, setVisibleOctaves] = useState(2);
   const touchMapRef = useRef<Map<number, string>>(new Map());
   const swipeStartRef = useRef<number>(0);
@@ -311,7 +318,7 @@ export function ResponsiveKeyboard({
               key={note}
               className="flex-1 border-r border-[#333] last:border-r-0 cursor-pointer touch-none transition-colors duration-75"
               style={{
-                backgroundColor: activeNotes.has(note) ? activeColor : whiteKeyColor,
+                backgroundColor: allActiveNotes.has(note) ? activeColor : whiteKeyColor,
                 minWidth: `${100 / totalWhiteKeys}%`,
               }}
               onTouchStart={(e) => handleTouchStart(e, note)}
@@ -337,13 +344,13 @@ export function ResponsiveKeyboard({
               key={note}
               className="absolute top-0 h-[60%] cursor-pointer touch-none transition-colors duration-75 rounded-b-sm box-border"
               style={{
-                backgroundColor: activeNotes.has(note) ? activeColor : blackKeyColor,
+                backgroundColor: allActiveNotes.has(note) ? activeColor : blackKeyColor,
                 left: `${leftPercent}%`,
                 width: `${widthPercent}%`,
                 minWidth: '24px',
-                borderLeft: activeNotes.has(note) ? '1px solid black' : 'none',
-                borderRight: activeNotes.has(note) ? '1px solid black' : 'none',
-                borderBottom: activeNotes.has(note) ? '1px solid black' : 'none',
+                borderLeft: allActiveNotes.has(note) ? '1px solid black' : 'none',
+                borderRight: allActiveNotes.has(note) ? '1px solid black' : 'none',
+                borderBottom: allActiveNotes.has(note) ? '1px solid black' : 'none',
               }}
               onTouchStart={(e) => handleTouchStart(e, note)}
               onTouchEnd={handleTouchEnd}

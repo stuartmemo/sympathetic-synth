@@ -15,6 +15,7 @@ interface SynthPanelProps {
 export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }: SynthPanelProps) {
   // Start with consistent state for SSR, then update on mount
   const [showControls, setShowControls] = useState(false);
+  const [midiActiveNotes, setMidiActiveNotes] = useState<Set<string>>(new Set());
 
   // Set initial visibility based on screen size after mount
   useEffect(() => {
@@ -144,6 +145,48 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
 
   useEffect(() => {
     synthRef.current = new Synth({ speakersOn: true, volume: 0.5 });
+
+    // Initialize MIDI
+    const audioEngine = getAudioEngine();
+    audioEngine.getMidi().then((midiAccess) => {
+      if (!midiAccess) return;
+
+      const handleMidiMessage = (event: MIDIMessageEvent) => {
+        const [status, note, velocity] = event.data as Uint8Array;
+        const command = status & 0xf0;
+
+        // Note on (with velocity > 0)
+        if (command === 0x90 && velocity > 0) {
+          const noteName = audioEngine.midiToNote(note);
+          audioEngine.resume();
+          synthRef.current?.playNote(noteName);
+          setMidiActiveNotes(prev => new Set(prev).add(noteName));
+        }
+        // Note off (or note on with velocity 0)
+        else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
+          const noteName = audioEngine.midiToNote(note);
+          synthRef.current?.stopNote(noteName);
+          setMidiActiveNotes(prev => {
+            const next = new Set(prev);
+            next.delete(noteName);
+            return next;
+          });
+        }
+      };
+
+      // Connect to all available MIDI inputs
+      midiAccess.inputs.forEach((input) => {
+        input.onmidimessage = handleMidiMessage;
+      });
+
+      // Handle new devices being connected
+      midiAccess.onstatechange = (event) => {
+        const port = event.port;
+        if (port.type === 'input' && port.state === 'connected') {
+          (port as MIDIInput).onmidimessage = handleMidiMessage;
+        }
+      };
+    });
 
     return () => {
       synthRef.current?.stopAll();
@@ -631,6 +674,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
         activeColor="#FFE976"
         octave={keyboardOctave}
         onOctaveChange={onKeyboardOctaveChange}
+        externalActiveNotes={midiActiveNotes}
       />
     </div>
   );
