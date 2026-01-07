@@ -1,23 +1,25 @@
 'use client';
 
 import { useEffect, useCallback, useState } from 'react';
-import { Synth } from '@/lib/audio/synth';
+import { Synth, FilterType } from '@/lib/audio/synth';
 import { getAudioEngine } from '@/lib/audio/audio-engine';
 import type { WaveformType } from '@/lib/audio/audio-engine';
 import { ResponsiveKeyboard } from './responsive-keyboard';
 
 interface SynthPanelProps {
   synthRef: React.MutableRefObject<Synth | null>;
+  keyboardOctave?: number;
+  onKeyboardOctaveChange?: (octave: number) => void;
 }
 
-export function SynthPanel({ synthRef }: SynthPanelProps) {
-  // Default to collapsed on mobile (< 768px), expanded on larger screens
-  const [showControls, setShowControls] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 768;
-    }
-    return false;
-  });
+export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }: SynthPanelProps) {
+  // Start with consistent state for SSR, then update on mount
+  const [showControls, setShowControls] = useState(false);
+
+  // Set initial visibility based on screen size after mount
+  useEffect(() => {
+    setShowControls(window.innerWidth >= 768);
+  }, []);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -56,6 +58,9 @@ export function SynthPanel({ synthRef }: SynthPanelProps) {
           break;
         case 'lfo':
           handleLFOChange(synth, name, value);
+          break;
+        case 'filter-type':
+          synth.setFilterType(value as FilterType);
           break;
       }
     },
@@ -155,14 +160,14 @@ export function SynthPanel({ synthRef }: SynthPanelProps) {
   }, [synthRef]);
 
   return (
-    <div className="w-full max-w-[916px] mx-auto">
+    <div className="w-full max-w-[916px] mx-auto xl:mx-0 xl:shrink-0 rounded-xl xl:rounded-r-none border border-white/[0.08] shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] overflow-hidden">
       {/* Header */}
-      <h1 className="bg-black text-white text-[19px] font-bold px-2.5 py-1.5 m-0 leading-relaxed flex items-center justify-between">
+      <h1 className="bg-black text-white text-[19px] font-bold pl-3 pr-2.5 py-1.5 m-0 leading-relaxed flex items-center justify-between font-[family-name:var(--font-montserrat)]">
         <span>Sympathetic Synthesizer System Mk II</span>
         {/* Mobile toggle button - visible below 768px */}
         <button
           onClick={() => setShowControls(!showControls)}
-          className="md:hidden text-sm font-normal bg-[#333] hover:bg-[#444] px-3 py-1 rounded"
+          className="md:hidden text-sm font-normal bg-[#333] hover:bg-[#444] px-3 py-1 rounded font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif]"
         >
           {showControls ? 'Hide Controls' : 'Show Controls'}
         </button>
@@ -396,7 +401,18 @@ export function SynthPanel({ synthRef }: SynthPanelProps) {
       <div className="grid grid-cols-1 md:grid-cols-[1fr_229px_150px] border-4 border-t-0 border-[#0c0c0c]">
         {/* Filter */}
         <div className="bg-[#db9ab7] p-3 md:border-r-4 border-[#0c0c0c]">
-          <h2 className="module-title text-pink-200">Filter</h2>
+          <div className="inline-block mb-[0.3em]">
+            <select
+              data-param="filter-type"
+              defaultValue="lowpass"
+              onChange={handleChange}
+              className="bg-black text-white font-bold text-[1em] pt-[5px] pb-[4px] px-[8px] border-none outline-none cursor-pointer rounded-[2px] leading-[1em] font-[family-name:var(--font-montserrat)] h-auto appearance-none"
+            >
+              <option value="lowpass">Lowpass</option>
+              <option value="highpass">Highpass</option>
+              <option value="bandpass">Bandpass</option>
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-x-4">
             <div>
               <label className="control-label">Attack</label>
@@ -613,6 +629,8 @@ export function SynthPanel({ synthRef }: SynthPanelProps) {
         onNoteOn={handleNoteOn}
         onNoteOff={handleNoteOff}
         activeColor="#FFE976"
+        octave={keyboardOctave}
+        onOctaveChange={onKeyboardOctaveChange}
       />
     </div>
   );

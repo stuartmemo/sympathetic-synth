@@ -8,6 +8,8 @@ interface ResponsiveKeyboardProps {
   activeColor?: string;
   whiteKeyColor?: string;
   blackKeyColor?: string;
+  octave?: number;
+  onOctaveChange?: (octave: number) => void;
 }
 
 const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -52,9 +54,13 @@ export function ResponsiveKeyboard({
   activeColor = '#FFE976',
   whiteKeyColor = '#fff',
   blackKeyColor = '#000',
+  octave: externalOctave,
+  onOctaveChange,
 }: ResponsiveKeyboardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [octave, setOctave] = useState(4);
+  const [internalOctave, setInternalOctave] = useState(4);
+  const octave = externalOctave ?? internalOctave;
+  const setOctave = onOctaveChange ?? setInternalOctave;
   const [activeNotes, setActiveNotes] = useState<Set<string>>(new Set());
   const [visibleOctaves, setVisibleOctaves] = useState(2);
   const touchMapRef = useRef<Map<number, string>>(new Map());
@@ -79,9 +85,15 @@ export function ResponsiveKeyboard({
   // Physical keyboard support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      // Ignore if typing in a text input (but allow sliders/range inputs)
+      if (e.target instanceof HTMLTextAreaElement) {
         return;
+      }
+      if (e.target instanceof HTMLInputElement) {
+        const inputType = (e.target as HTMLInputElement).type;
+        if (inputType !== 'range' && inputType !== 'checkbox' && inputType !== 'radio') {
+          return;
+        }
       }
 
       const key = e.key.toLowerCase();
@@ -249,8 +261,8 @@ export function ResponsiveKeyboard({
   const handleSwipeEnd = (e: React.TouchEvent) => {
     const diff = e.changedTouches[0].clientX - swipeStartRef.current;
     if (Math.abs(diff) > 80) {
-      if (diff > 0 && octave > 1) setOctave((o) => o - 1);
-      else if (diff < 0 && octave < 6) setOctave((o) => o + 1);
+      if (diff > 0 && octave > 1) setOctave(octave - 1);
+      else if (diff < 0 && octave < 6) setOctave(octave + 1);
     }
   };
 
@@ -261,28 +273,28 @@ export function ResponsiveKeyboard({
   return (
     <div
       ref={containerRef}
-      className="relative bg-black border-4 border-t-0 border-[#0c0c0c] w-full select-none"
+      className="relative bg-black border-x-4 border-b-4 border-[#0c0c0c] w-full select-none"
     >
       {/* Octave Navigation */}
       <div
-        className="flex items-center justify-between px-2 py-2 bg-black/80"
+        className="flex items-center justify-between px-2 pt-1 pb-2 bg-black/80"
         onTouchStart={handleSwipeStart}
         onTouchEnd={handleSwipeEnd}
       >
         <button
-          onClick={() => octave > 1 && setOctave((o) => o - 1)}
-          className="bg-[#333] hover:bg-[#444] text-white px-4 py-2 rounded min-w-[44px] min-h-[44px] text-lg font-bold disabled:opacity-30"
+          onClick={() => octave > 1 && setOctave(octave - 1)}
+          className="bg-[#333] hover:bg-[#444] text-white rounded w-[36px] h-[36px] text-base font-bold disabled:opacity-30 flex items-center justify-center leading-none border-0"
           disabled={octave <= 1}
           aria-label="Lower octave"
         >
           &lt;
         </button>
-        <span className="text-white/70 text-sm font-mono">
+        <span className="text-white/70 text-xs font-mono">
           C{octave} - C{octave + visibleOctaves}
         </span>
         <button
-          onClick={() => octave < 6 && setOctave((o) => o + 1)}
-          className="bg-[#333] hover:bg-[#444] text-white px-4 py-2 rounded min-w-[44px] min-h-[44px] text-lg font-bold disabled:opacity-30"
+          onClick={() => octave < 6 && setOctave(octave + 1)}
+          className="bg-[#333] hover:bg-[#444] text-white rounded w-[36px] h-[36px] text-base font-bold disabled:opacity-30 flex items-center justify-center leading-none border-0"
           disabled={octave >= 6}
           aria-label="Higher octave"
         >
@@ -323,12 +335,15 @@ export function ResponsiveKeyboard({
           return (
             <div
               key={note}
-              className="absolute top-0 h-[60%] cursor-pointer touch-none transition-colors duration-75 rounded-b-sm"
+              className="absolute top-0 h-[60%] cursor-pointer touch-none transition-colors duration-75 rounded-b-sm box-border"
               style={{
                 backgroundColor: activeNotes.has(note) ? activeColor : blackKeyColor,
                 left: `${leftPercent}%`,
                 width: `${widthPercent}%`,
                 minWidth: '24px',
+                borderLeft: activeNotes.has(note) ? '1px solid black' : 'none',
+                borderRight: activeNotes.has(note) ? '1px solid black' : 'none',
+                borderBottom: activeNotes.has(note) ? '1px solid black' : 'none',
               }}
               onTouchStart={(e) => handleTouchStart(e, note)}
               onTouchEnd={handleTouchEnd}

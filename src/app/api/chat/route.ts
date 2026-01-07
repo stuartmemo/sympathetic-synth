@@ -23,7 +23,8 @@ The synthesizer has:
   - Frequency: 0 to 30 Hz (modulation rate)
   - Depth: 0 to 100 (modulation amount - affects pitch in cents, filter in Hz)
 
-- Filter envelope (ADSR for the lowpass filter):
+- Filter type: lowpass, highpass, or bandpass
+- Filter envelope (ADSR for the filter):
   - Attack: 0 to 5 seconds
   - Decay: 0 to 2.5 seconds
   - Sustain: 0 to 10000 Hz
@@ -46,6 +47,8 @@ The synthesizer has:
 
 - Master volume: 0 to 1
 
+- Keyboard octave: 1 to 6 (the base octave of the keyboard - lower numbers = lower pitch)
+
 Sound design tips:
 - For warm pads: use triangle/sine waves, slow attack, high sustain, low cutoff, range 8-16
 - For punchy bass: use square/sawtooth, fast attack, short decay, range 32 (lowest octave)
@@ -58,11 +61,17 @@ Sound design tips:
 - For movement: use slow LFO (0.1-1 Hz) with subtle depth for evolving textures
 
 Important guidelines:
-- Range controls octave: 32 is the LOWEST (bass), 2 is the HIGHEST (lead). Always set range for bass sounds to 32 or 16.
+- ALWAYS set BOTH the oscillator range AND the keyboard octave based on the sound type:
+  - Bass sounds (bass, sub, 808, kick, low): range 32 (all oscillators), keyboardOctave 2 or 3
+  - Mid-range sounds (pads, strings, keys, piano): range 8 or 16, keyboardOctave 4
+  - Lead sounds (lead, melody, high, bright): range 2 or 4, keyboardOctave 4 or 5
+  - If the user mentions a song or artist known for bass (e.g., dubstep, EDM bass), use range 32, keyboardOctave 2
+  - If the user mentions synth-pop or 80s leads (e.g., A-ha, Van Halen Jump), use range 4-8, keyboardOctave 4
+  - If the user mentions ambient/cinematic (e.g., Vangelis, Blade Runner), use range 8-16, keyboardOctave 3-4 with slow envelopes
 - Keep release time at 0.2-0.5 seconds minimum to avoid abrupt cutoffs, unless the user specifically wants staccato sounds.
 - Fast attack (0.01-0.05) with reasonable release (0.3+) creates punchy but smooth bass sounds.
 
-Always use the adjustSynthSettings tool to apply your sound design choices. Explain briefly what settings you're changing and why.`,
+Always use the adjustSynthSettings tool to apply your sound design choices. Always set the range/octave appropriately for the sound. Explain briefly what settings you're changing and why.`,
     messages,
     tools: {
       adjustSynthSettings: tool({
@@ -80,6 +89,7 @@ Always use the adjustSynthSettings tool to apply your sound design choices. Expl
           osc3Range: z.union([z.literal(2), z.literal(4), z.literal(8), z.literal(16), z.literal(32)]).optional().describe('Oscillator 3 range (octave: 32=lowest, 2=highest)'),
           osc3Detune: z.number().min(-50).max(50).optional().describe('Oscillator 3 detune in cents'),
           osc3Volume: z.number().min(0).max(1).optional().describe('Oscillator 3 volume'),
+          filterType: z.enum(['lowpass', 'highpass', 'bandpass']).optional().describe('Filter type'),
           filterAttack: z.number().min(0).max(5).optional().describe('Filter envelope attack time in seconds'),
           filterDecay: z.number().min(0).max(2.5).optional().describe('Filter envelope decay time in seconds'),
           filterSustain: z.number().min(0).max(10000).optional().describe('Filter envelope sustain level in Hz'),
@@ -99,6 +109,7 @@ Always use the adjustSynthSettings tool to apply your sound design choices. Expl
           lfoWaveform: z.enum(['sine', 'triangle', 'sawtooth', 'square']).optional().describe('LFO waveform'),
           lfoFrequency: z.number().min(0).max(30).optional().describe('LFO frequency in Hz (modulation rate)'),
           lfoDepth: z.number().min(0).max(100).optional().describe('LFO depth (modulation amount)'),
+          keyboardOctave: z.number().min(1).max(6).optional().describe('Keyboard base octave (1-6). Set to 2-3 for bass sounds, 4 for mid-range, 5-6 for leads'),
         }),
       }),
     },

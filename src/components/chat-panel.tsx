@@ -2,14 +2,16 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useEffect, useRef } from 'react';
-import type { Synth } from '@/lib/audio/synth';
+import type { Synth, FilterType } from '@/lib/audio/synth';
 import type { WaveformType } from '@/lib/audio/audio-engine';
 
 interface ChatPanelProps {
   synthRef: React.MutableRefObject<Synth | null>;
+  keyboardOctave: number;
+  onKeyboardOctaveChange: (octave: number) => void;
 }
 
-export function ChatPanel({ synthRef }: ChatPanelProps) {
+export function ChatPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
@@ -32,6 +34,7 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
           osc3Range?: number;
           osc3Detune?: number;
           osc3Volume?: number;
+          filterType?: FilterType;
           filterAttack?: number;
           filterDecay?: number;
           filterSustain?: number;
@@ -51,6 +54,7 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
           lfoWaveform?: WaveformType;
           lfoFrequency?: number;
           lfoDepth?: number;
+          keyboardOctave?: number;
         };
 
         // Apply oscillator settings
@@ -68,6 +72,9 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
         if (args.osc3Range) synth.updateOscillator('osc3', 'range', args.osc3Range);
         if (args.osc3Detune !== undefined) synth.updateOscillator('osc3', 'detune', args.osc3Detune);
         if (args.osc3Volume !== undefined) synth.updateMixer('osc3', args.osc3Volume);
+
+        // Apply filter type
+        if (args.filterType) synth.setFilterType(args.filterType);
 
         // Apply filter envelope settings
         if (args.filterAttack !== undefined) synth.filterEnvelopeSettings.attack = args.filterAttack;
@@ -99,6 +106,9 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
         if (args.lfoFrequency !== undefined) synth.updateLFO('frequency', args.lfoFrequency);
         if (args.lfoDepth !== undefined) synth.updateLFO('depth', args.lfoDepth);
 
+        // Apply keyboard octave
+        if (args.keyboardOctave !== undefined) onKeyboardOctaveChange(args.keyboardOctave);
+
         // Update UI sliders to reflect changes
         updateUIFromSettings(args);
 
@@ -106,6 +116,29 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
       }
     },
   });
+
+  const animateSlider = (element: HTMLInputElement, targetValue: number, delay = 0, duration = 600) => {
+    const startValue = parseFloat(element.value);
+
+    setTimeout(() => {
+      const startTime = performance.now();
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out exponential - smoother deceleration
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const currentValue = startValue + (targetValue - startValue) * eased;
+        element.value = String(currentValue);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      requestAnimationFrame(animate);
+    }, delay);
+  };
 
   const updateUIFromSettings = (args: Record<string, unknown>) => {
     // Update UI inputs to reflect the new settings
@@ -123,6 +156,7 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
       osc3Range: { selector: '[data-oscillator="osc3"][data-param="range"]', value: args.osc3Range },
       osc3Detune: { selector: '[data-oscillator="osc3"][data-param="detune"]', value: args.osc3Detune },
       osc3Volume: { selector: '[data-oscillator="osc3"][data-param="mixer"]', value: args.osc3Volume },
+      filterType: { selector: '[data-param="filter-type"]', value: args.filterType },
       filterCutoff: { selector: '[name="cutoffFrequency"]', value: args.filterCutoff },
       filterEmphasis: { selector: '[name="emphasis"]', value: args.filterEmphasis },
       // Filter envelope - UI uses transformed values
@@ -148,11 +182,18 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
       lfoDepth: { selector: '[name="lfo-depth"]', value: args.lfoDepth },
     };
 
+    let sliderIndex = 0;
     Object.entries(mappings).forEach(([key, { selector, value }]) => {
       if (value !== undefined && args[key] !== undefined) {
         const element = document.querySelector(selector) as HTMLInputElement | HTMLSelectElement;
         if (element) {
-          element.value = String(value);
+          // Animate sliders with staggered delay, instantly set selects
+          if (element.type === 'range') {
+            animateSlider(element as HTMLInputElement, Number(value), sliderIndex * 30);
+            sliderIndex++;
+          } else {
+            element.value = String(value);
+          }
         }
       }
     });
@@ -168,7 +209,7 @@ export function ChatPanel({ synthRef }: ChatPanelProps) {
       <div className="chat-messages">
         {messages.length === 0 && (
           <div className="chat-message assistant">
-            Describe the sound you want to create! For example: &quot;warm pad with slow attack&quot; or &quot;punchy bass with lots of resonance&quot;
+            Describe the sound you want to create! For example: &quot;A kitten drunk on sparkling wine&quot; or &quot;Vangelis, Bladerunner&quot;.
           </div>
         )}
         {messages.map((message) => (

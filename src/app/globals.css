@@ -8,10 +8,29 @@
 }
 
 body {
-  background: #273e49;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(60, 70, 80, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(40, 50, 60, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #1a1d21 0%, #0d0f12 25%, #12151a 50%, #0a0c0f 75%, #0d0f12 100%);
+  background-attachment: fixed;
   font-family: ui-monospace, 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
   margin: 0;
   padding: 20px;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 30%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Module title styling */
@@ -35,7 +54,7 @@ body {
   line-height: 1;
   margin-top: 6px;
   margin-bottom: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Range slider styling */
@@ -75,88 +94,130 @@ body {
   width: 100%;
   max-width: 916px;
   margin: 0 auto;
-  background: #1a2a33;
-  border-radius: 0 0 8px 8px;
-  border: 4px solid #0c0c0c;
+  background: linear-gradient(145deg, rgba(20, 22, 28, 0.95), rgba(12, 14, 18, 0.98));
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 12px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-top: none;
   display: flex;
   flex-direction: column;
   height: 200px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Side-by-side layout on xl screens */
+@media (min-width: 1280px) {
+  .chat-panel {
+    width: 350px;
+    max-width: none;
+    margin: 0;
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    height: auto;
+    min-height: 0;
+    align-self: stretch;
+    margin-left: -1px;
+    overflow: hidden;
+  }
 }
 
 .chat-header {
   background: black;
   color: white;
-  padding: 10px 15px;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 19px;
   font-weight: 700;
+  line-height: 1.6;
+}
+
+@media (min-width: 1280px) {
+  .chat-header {
+    border-top-right-radius: 11px;
+  }
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 15px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  min-height: 0;
 }
 
 .chat-message {
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
   font-size: 13px;
-  line-height: 1.4;
-  max-width: 80%;
+  line-height: 1.5;
+  max-width: 85%;
+  letter-spacing: 0.2px;
+  font-family: inherit;
 }
 
 .chat-message.user {
   background: #ffe976;
-  color: black;
+  color: #1a1a1a;
   align-self: flex-end;
+  border-radius: 12px 12px 4px 12px;
+  box-shadow: 0 2px 8px rgba(255, 233, 118, 0.25);
 }
 
 .chat-message.assistant {
-  background: #3a4a53;
-  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
   align-self: flex-start;
+  border-radius: 12px 12px 12px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .chat-input-container {
-  padding: 10px 15px;
-  border-top: 1px solid #3a4a53;
+  padding: 14px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .chat-input {
   width: 100%;
-  padding: 10px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #3a4a53;
-  color: white;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .chat-input::placeholder {
-  color: #8a9aa3;
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .chat-input:focus {
-  outline: 2px solid #ffe976;
+  outline: none;
+  border-color: rgba(212, 168, 84, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(212, 168, 84, 0.15);
 }
 
 .tool-status {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .tool-applied {
   display: inline-block;
-  background: #2d5a3d;
+  background: rgba(110, 180, 130, 0.2);
   color: #7ee89b;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(126, 232, 155, 0.2);
 }
 
 /* Touch-friendly controls for mobile */

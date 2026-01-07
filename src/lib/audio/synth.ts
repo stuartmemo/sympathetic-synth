@@ -20,10 +20,13 @@ export interface MixerChannel {
   active: boolean;
 }
 
+export type FilterType = 'lowpass' | 'highpass' | 'bandpass';
+
 export interface FilterEnvelopeSettings extends EnvelopeOptions {
   Q: number;
   cutoffFrequency: number;
   contour: number; // 0-1, envelope intensity multiplier
+  filterType: FilterType;
 }
 
 export interface LFOSettings {
@@ -80,6 +83,7 @@ export class Synth {
     Q: 5,
     cutoffFrequency: 10000,
     contour: 1, // Full envelope intensity by default
+    filterType: 'lowpass',
   };
 
   // LFO settings (Moog-style: modulates both pitch and filter)
@@ -149,7 +153,7 @@ export class Synth {
     this.noiseLevel = this.audioEngine.createGain(0);
     this.noiseFilter = this.audioEngine.createFilter('bandpass', 1000, 1);
 
-    // Connect mixer channels to master
+    // Connect mixer channels to limiter
     for (const key of Object.keys(this.mixer)) {
       this.mixer[key].node.connect(limiter);
     }
@@ -342,7 +346,7 @@ export class Synth {
     oscillators.forEach((osc, index) => {
       const gainNode = this.audioEngine.createGain(0);
       const filter = this.audioEngine.createFilter(
-        'lowpass',
+        this.filterEnvelopeSettings.filterType,
         this.filterEnvelopeSettings.cutoffFrequency,
         this.filterEnvelopeSettings.Q
       );
@@ -482,10 +486,7 @@ export class Synth {
       this.noiseSource.start();
       this.noiseStarted = true;
     }
-
-    // Open/close the noise gate based on level
-    // This makes noise continuous when level > 0, not just when notes are playing
-    this.noiseGate.gain.value = value > 0 ? 1 : 0;
+    // Noise gate is controlled by note on/off, not by level
   }
 
   /**
@@ -500,6 +501,14 @@ export class Synth {
    */
   setNoiseFilterQ(value: number): void {
     this.noiseFilter.Q.value = Math.max(0.1, Math.min(20, value));
+  }
+
+  /**
+   * Set filter type
+   */
+  setFilterType(type: FilterType): void {
+    this.filterEnvelopeSettings.filterType = type;
+    // Note: This will affect new notes; active notes keep their current filter type
   }
 
   /**
