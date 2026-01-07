@@ -182,7 +182,7 @@ export function SynthPanel({ synthRef, keyboardOctave, onKeyboardOctaveChange }:
       // Handle new devices being connected
       midiAccess.onstatechange = (event) => {
         const port = event.port;
-        if (port.type === 'input' && port.state === 'connected') {
+        if (port && port.type === 'input' && port.state === 'connected') {
           (port as MIDIInput).onmidimessage = handleMidiMessage;
         }
       };
